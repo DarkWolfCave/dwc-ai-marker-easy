@@ -5,7 +5,7 @@
 **Description:** Automatisches Markieren von KI-generierten Bildern mit einem Badge in WordPress.  
 **Version:** 1.0.1  
 **Author:** DarkWolfCave.de  
-**License:** MIT
+**License:** GPL v2 or later
 
 ## Beschreibung
 
@@ -37,4 +37,4 @@ Nach der Aktivierung des Plugins werden alle Medienbilder auf KI-Erzeugung gepr�
 - Unterstützung für GenerateBlocks Image Block.
 
 ## Lizenz
-Dieses Plugin ist unter der MIT-Lizenz veröffentlicht. Weitere Informationen findest du in der [LICENSE](LICENSE).
+Dieses Plugin ist unter der GPL-Lizenz veröffentlicht. Weitere Informationen findest du in der [LICENSE](LICENSE).

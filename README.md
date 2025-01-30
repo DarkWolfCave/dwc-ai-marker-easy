@@ -37,4 +37,4 @@ Nach der Aktivierung des Plugins werden alle Medienbilder auf KI-Erzeugung gepr�
 - Unterstützung für GenerateBlocks Image Block.
 
 ## Lizenz
-Dieses Plugin ist unter der MIT-Lizenz veröffentlicht. Weitere Informationen findest du in der [License.txt](LICENSE.txt).
+Dieses Plugin ist unter der MIT-Lizenz veröffentlicht. Weitere Informationen findest du in der [LICENSE](LICENSE).

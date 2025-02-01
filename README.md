@@ -3,7 +3,7 @@
 **Plugin Name:** DWC AI Image Marker  
 **Plugin URI:** [https://darkwolfcave.de](https://darkwolfcave.de)  
 **Description:** Automatisches Markieren von KI-generierten Bildern mit einem Badge in WordPress.  
-**Version:** 1.0.1  
+**Version:** 1.1.0  
 **Author:** DarkWolfCave.de  
 **License:** GPL v2 or later
 
@@ -17,6 +17,7 @@ Der DWC AI Image Marker ist ein WordPress-Plugin, das KI-generierte Bilder in de
 - Verwaltung der Markierungen in der Medienübersicht
 - Unterstützung von Bulk-Actions
 - Anpassbare Badge-Position und -Text über Einstellungen
+- Benutzerdefinierte CSS-Optionen direkt über die Admin-Seite konfigurierbar
 - Unterstützung von GenerateBlocks Image Blocks
 
 ## Installation
@@ -27,9 +28,14 @@ Der DWC AI Image Marker ist ein WordPress-Plugin, das KI-generierte Bilder in de
 
 ## Nutzung
 
-Nach der Aktivierung des Plugins werden alle Medienbilder auf KI-Erzeugung geprüft, sofern diese Funktion aktiviert ist. Gehe zu 'Einstellungen' > 'AI Image Marker', um die Badge-Attribute zu konfigurieren.
+Nach der Aktivierung des Plugins werden alle Medienbilder auf KI-Erzeugung geprüft, sofern diese Funktion aktiviert ist. Gehe zu 'Einstellungen' > 'AI Image Marker', um die Badge-Attribute zu konfigurieren und neue CSS-Optionen festzulegen.
 
 ## Änderungshistorie
+
+### Version 1.1.0
+- Hinzufügung von benutzerdefinierbaren CSS-Optionen via Admin-Oberfläche
+- Unterstützung zur Anpassung von Badge-Hintergrundfarbe, Schriftart, Transparenz und Randabständen
+- JavaScript-Funktionalität zum Zurücksetzen auf Standardwerte
 
 ### Version 1.0.1
 - Initiale Veröffentlichung.
@@ -38,3 +44,4 @@ Nach der Aktivierung des Plugins werden alle Medienbilder auf KI-Erzeugung gepr�
 
 ## Lizenz
 Dieses Plugin ist unter der GPL-Lizenz veröffentlicht. Weitere Informationen findest du in der [LICENSE](LICENSE).
+

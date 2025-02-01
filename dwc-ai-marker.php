@@ -3,7 +3,7 @@
  * Plugin Name: DWC AI Image Marker
  * Plugin URI: https://github.com/DarkWolfCave/dwc-ai-marker-easy/archive/refs/heads/master.zip
  * Description: Markiert KI-generierte Bilder automatisch mit einem Badge und verwaltet diese zentral in WordPress.
- * Version: 1.0.1
+ * Version: 1.1.0
  * Author: DarkWolfCave.de
  * Author URI: https://darkwolfcave.de
  * License: GPL v2 or later
@@ -18,8 +18,19 @@ if (!defined('ABSPATH')) {
 
 class DWC_AI_Image_Marker {
     // Plugin-Version
-    private $version = '1.0.1';
+    private $version = '1.1.0';
     private $options = null;
+    private static $defaults = array(
+        'badge_text' => 'KI-generiert',
+        'position' => 'top-left',
+        'background_color' => '#000000',
+        'font_family' => '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
+        'opacity' => 0.7,
+        'padding_top' => 5,
+        'padding_right' => 10,
+        'padding_bottom' => 5,
+        'padding_left' => 10
+    );
     // Konstruktor
     public function __construct() {
         // Hook für die Plugin-Initialisierung
@@ -93,6 +104,12 @@ class DWC_AI_Image_Marker {
                 'default' => array('badge_text' => 'KI-generiert')
             )
         );
+        // Registrierung der neuen Einstellungen
+        register_setting('dwc_ai_marker_settings_group', 'dwc_ai_marker_settings[background_color]');
+        register_setting('dwc_ai_marker_settings_group', 'dwc_ai_marker_settings[font_family]');
+        register_setting('dwc_ai_marker_settings_group', 'dwc_ai_marker_settings[opacity]');
+        register_setting('dwc_ai_marker_settings_group', 'dwc_ai_marker_settings[padding]');
+
     }
 
     // Bulk-Actions zur Medienbibliothek hinzufügen
@@ -166,6 +183,14 @@ class DWC_AI_Image_Marker {
     public function sanitize_settings($input) {
         $sanitized = array();
         $sanitized['badge_text'] = sanitize_text_field($input['badge_text']);
+        // Sanitize die neuen Einstellungen
+        $sanitized['background_color'] = sanitize_hex_color($input['background_color']); // Hex-farben-Säuberung
+        $sanitized['font_family'] = sanitize_text_field($input['font_family']);
+        $sanitized['opacity'] = floatval($input['opacity']);
+        $sanitized['padding_top'] = intval($input['padding_top']);
+        $sanitized['padding_right'] = intval($input['padding_right']);
+        $sanitized['padding_bottom'] = intval($input['padding_bottom']);
+        $sanitized['padding_left'] = intval($input['padding_left']);
 
         // Position validieren
         $valid_positions = array('top-left', 'top-right', 'bottom-left', 'bottom-right');
@@ -200,6 +225,14 @@ class DWC_AI_Image_Marker {
             default: // top-left
                 $css .= "left: 10px !important; right: auto !important; top: 10px !important; bottom: auto !important;";
         }
+        // Hinzufügen der Styles für die neuen Optionen
+        $css .= "background-color: " . esc_attr($options['background_color']) . " !important;";
+        $css .= "font-family: " . esc_attr($options['font_family']) . " !important;";
+        $css .= "opacity: " . esc_attr($options['opacity']) . " !important;";
+        $css .= "padding: " . esc_attr($options['padding_top']) . "px " .
+            esc_attr($options['padding_right']) . "px " .
+            esc_attr($options['padding_bottom']) . "px " .
+            esc_attr($options['padding_left']) . "px !important;";
         $css .= "}";
 
         // Anpassung des Hover-Effekts je nach Position
@@ -226,7 +259,10 @@ class DWC_AI_Image_Marker {
     // Helper-Funktion für Options
     private function get_options() {
         if ($this->options === null) {
-            $this->options = get_option('dwc_ai_marker_settings', array('badge_text' => 'KI-generiert'));
+            $this->options = wp_parse_args(
+                get_option('dwc_ai_marker_settings', array()),
+                self::$defaults
+            );
         }
         return $this->options;
     }
@@ -259,12 +295,67 @@ class DWC_AI_Image_Marker {
             <h1>DWC AI Image Marker Einstellungen</h1>
             <form method="post" action="options.php">
                 <?php settings_fields('dwc_ai_marker_settings_group'); ?>
+                <style>
+                    .dwc-padding-settings label {
+                        display: inline-block;
+                        width: 50px; /* Breite für die Label */
+                        text-align: right;
+                        margin-right: 5px;
+                    }
+                    .dwc-padding-settings input {
+                        width: 60px; /* Breite für die Eingabefelder */
+                    }
+                </style>
+
                 <table class="form-table">
                     <tr>
                         <th>Badge Text</th>
                         <td>
                             <input type="text" name="dwc_ai_marker_settings[badge_text]"
                                    value="<?php echo esc_attr($options['badge_text']); ?>" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Hintergrundfarbe</th>
+                        <td>
+                            <input type="color" name="dwc_ai_marker_settings[background_color]"
+                                   value="<?php echo esc_attr($options['background_color']); ?>" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Schriftart</th>
+                        <td>
+                            <input type="text" name="dwc_ai_marker_settings[font_family]"
+                                   value="<?php echo esc_attr($options['font_family']); ?>" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Transparenz</th>
+                        <td>
+                            <input type="range" min="0" max="1" step="0.1" name="dwc_ai_marker_settings[opacity]"  id="opacity_range"
+                                   value="<?php echo esc_attr($options['opacity']); ?>" />
+                            <input type="text" id="opacity_display" value="<?php echo esc_attr($options['opacity']); ?>" readonly size="3" />
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Randabstände</th>
+                        <td class="dwc-padding-settings">
+                            <label for="padding_top">Oben:</label>
+                            <input type="number" name="dwc_ai_marker_settings[padding_top]"
+                                   value="<?php echo esc_attr($options['padding_top']); ?>" /> px
+                            <br>
+                            <label for="padding_right">Rechts:</label>
+                            <input type="number" name="dwc_ai_marker_settings[padding_right]"
+                                   value="<?php echo esc_attr($options['padding_right']); ?>" /> px
+                            <br>
+                            <label for="padding_bottom">Unten:</label>
+                            <input type="number" name="dwc_ai_marker_settings[padding_bottom]"
+                                   value="<?php echo esc_attr($options['padding_bottom']); ?>" /> px
+                            <br>
+                            <label for="padding_left">Links:</label>
+                            <input type="number" name="dwc_ai_marker_settings[padding_left]"
+                                   value="<?php echo esc_attr($options['padding_left']); ?>" /> px
                         </td>
                     </tr>
                     <tr>
@@ -280,7 +371,39 @@ class DWC_AI_Image_Marker {
                     </tr>
                 </table>
                 <?php submit_button(); ?>
+                <input type="button" id="reset_defaults" class="button" value="Standardwerte" />
+
             </form>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const resetButton = document.getElementById('reset_defaults');
+
+                    // Hole Standardwerte aus get_options als separate Standardwerte
+                    const defaults = <?php echo wp_json_encode(self::$defaults); ?>;
+
+                    resetButton.addEventListener('click', function() {
+                        document.querySelector('input[name="dwc_ai_marker_settings[badge_text]"]').value = defaults.badge_text;
+                        document.querySelector('input[name="dwc_ai_marker_settings[background_color]"]').value = defaults.background_color;
+                        document.querySelector('select[name="dwc_ai_marker_settings[position]"]').value = defaults.position;
+                        document.querySelector('input[name="dwc_ai_marker_settings[font_family]"]').value = defaults.font_family;
+                        document.querySelector('input[name="dwc_ai_marker_settings[opacity]"]').value = defaults.opacity;
+                        document.querySelector('input[name="dwc_ai_marker_settings[padding_top]"]').value = defaults.padding_top;
+                        document.querySelector('input[name="dwc_ai_marker_settings[padding_right]"]').value = defaults.padding_right;
+                        document.querySelector('input[name="dwc_ai_marker_settings[padding_bottom]"]').value = defaults.padding_bottom;
+                        document.querySelector('input[name="dwc_ai_marker_settings[padding_left]"]').value = defaults.padding_left;
+                        document.getElementById('opacity_display').value = defaults.opacity;
+                    });
+                });
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const opacityRange = document.getElementById('opacity_range');
+                    const opacityDisplay = document.getElementById('opacity_display');
+
+                    opacityRange.addEventListener('input', function () {
+                        opacityDisplay.value = opacityRange.value;
+                    });
+                });
+            </script>
         </div>
         <?php
     }
@@ -418,7 +541,14 @@ function dwc_ai_marker_activate() {
     if (!get_option('dwc_ai_marker_settings')) {
         update_option('dwc_ai_marker_settings', array(
             'badge_text' => 'KI-generiert',
-            'position' => 'top-left'
+            'position' => 'top-left',
+            'background_color' => '#000000', // Standardeinstellung aus CSS: rgba(0, 0, 0, 0.7)
+            'font_family' => '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
+            'opacity' => 0.7, // Transparentwert aus der CSS
+            'padding_top' => 5,    // Standardwert in Pixeln
+            'padding_right' => 10,
+            'padding_bottom' => 5,
+            'padding_left' => 10
         ));
     }
 }
